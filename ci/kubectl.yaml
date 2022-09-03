@@ -1,0 +1,68 @@
+---
+# Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: icefery
+
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-maven
+  namespace: icefery
+  labels:
+    app: my-app-maven
+spec:
+  selector:
+    app: my-app-maven
+  type: ClusterIP
+  ports:
+    - { name: http, protocol: TCP, port: 8080, targetPort: 8080 }
+
+---
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app-maven
+  namespace: icefery
+  labels:
+    app: my-app-maven
+spec:
+  selector:
+    matchLabels:
+      app: my-app-maven
+  template:
+    metadata:
+      labels:
+        app: my-app-maven
+    spec:
+      containers:
+        - name: my-app-maven
+          image: core.harbor.dev.icefery.xyz/icefery/my-app-maven:0.0.1
+          ports:
+            - { name: http, protocol: TCP, containerPort: 8080 }
+
+---
+# Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-app-maven
+  namespace: icefery
+  labels:
+    app: my-app-maven
+spec:
+  rules:
+    - host: my-app-maven.dev.icefery.xyz
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: my-app-maven
+                port:
+                  number: 8080

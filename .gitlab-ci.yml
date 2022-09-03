@@ -1,0 +1,62 @@
+variables:
+  # 镜像注册表
+  IMAGE_REGISTRY_NAME: core.harbor.dev.icefery.xyz
+  IMAGE_REGISTRY_USERNAME: admin
+  IMAGE_REGISTRY_PASSWORD: admin
+  # 应用
+  APP_GROUP: icefery
+  APP_NAME: my-app-maven
+  APP_VERSION: 0.0.1
+
+stages:
+  - package
+  - build
+  - deploy
+
+package-jar:
+  image: maven:3.8-openjdk-17
+  stage: package
+  tags:
+    # 选择执行器为 Kubernetes 的 GitLab Runner 执行作业
+    - executor=kubernetes
+  variables:
+    MAVEN_OPTS: -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2
+  cache:
+    key: m2
+    paths:
+      - .m2
+  before_script:
+    # 移除 Maven 镜像中默认的配置文件
+    - rm -rf /usr/share/maven/conf/settings.xml
+  script:
+    - mvn clean package
+  artifacts:
+    paths:
+      - target/*.jar
+
+build-docker-image:
+  stage: build
+  tags:
+    # 选择执行器为 Shell 并且可以执行 nerdctl 命令的 GitLab Runner 执行作业
+    - executor=shell
+    - command=nerdctl
+  before_script:
+    # non-interactively shell 需要手动配置环境变量
+    - source /etc/custom.sh
+  script:
+    # 构建镜像
+    - sudo nerdctl build --tag ${IMAGE_REGISTRY_NAME}/${APP_GROUP}/${APP_NAME}:${APP_VERSION} --platform linux/amd64,linux/arm64 .
+    # 登录镜像注册表
+    - sudo nerdctl login http://${IMAGE_REGISTRY_NAME} --username ${IMAGE_REGISTRY_USERNAME} --password ${IMAGE_REGISTRY_PASSWORD}
+    # 推送镜像
+    - sudo nerdctl push ${IMAGE_REGISTRY_NAME}/${APP_GROUP}/${APP_NAME}:${APP_VERSION} --all-platforms
+
+deploy-to-kubernetes:
+  stage: deploy
+  tags:
+    - executor=shell
+    - command=kubectl
+  before_script:
+    - source /etc/custom.sh
+  script:
+    - sudo kubectl apply -f ci/kubectl.yaml
