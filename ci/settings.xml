@@ -7,4 +7,12 @@
             <mirrorOf>*</mirrorOf>
         </mirror>
     </mirrors>
+
+    <servers>
+        <server>
+            <id>maven-custom</id>
+            <username>admin</username>
+            <password>admin</password>
+        </server>
+    </servers>
 </settings>
