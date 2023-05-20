@@ -1,0 +1,6 @@
+FROM --platform=${TARGETPLATFORM} ubuntu:22.04
+ENV WORKDIR=/my-app APP_NAME=my-app-maven
+WORKDIR ${WORKDIR}
+COPY target/${APP_NAME} app
+EXPOSE 8080
+ENTRYPOINT ["./app"]
