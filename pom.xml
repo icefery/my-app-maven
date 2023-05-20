@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project>
     <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.1.0</version>
+        <relativePath/>
+    </parent>
 
     <groupId>xyz.icefery.demo</groupId>
     <artifactId>my-app-maven</artifactId>
@@ -8,11 +15,6 @@
 
     <properties>
         <java.version>17</java.version>
-        <maven.compiler.target>17</maven.compiler.target>
-        <maven.compiler.source>17</maven.compiler.source>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring-boot.version>2.7.3</spring-boot.version>
     </properties>
 
     <dependencies>
@@ -22,57 +24,56 @@
         </dependency>
     </dependencies>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <build>
         <plugins>
             <plugin>
+                <groupId>org.graalvm.buildtools</groupId>
+                <artifactId>native-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${spring-boot.version}</version>
-                <configuration>
-                    <mainClass>xyz.icefery.demo.App</mainClass>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>repackage</id>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
 
     <repositories>
+        <!-- aliyun -->
         <repository>
-            <id>maven-public</id>
-            <url>http://nexus.dev.icefery.xyz/repository/maven-public/</url>
+            <id>aliyun-public</id>
+            <url>https://maven.aliyun.com/repository/public</url>
+        </repository>
+        <!-- nexus -->
+        <repository>
+            <id>nexus-public</id>
+            <url>http://nexus.demo.icefery.xyz/repository/nexus-public</url>
+        </repository>
+        <!-- github packages -->
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/icefery/my-app-maven</url>
         </repository>
     </repositories>
 
     <pluginRepositories>
         <pluginRepository>
-            <id>maven-public</id>
-            <url>http://nexus.dev.icefery.xyz/repository/maven-public/</url>
+            <id>aliyun-public</id>
+            <url>https://maven.aliyun.com/repository/public</url>
         </pluginRepository>
     </pluginRepositories>
 
     <distributionManagement>
+        <!-- nexus -->
+        <!--  
+            <repository>
+                <id>nexus-release</id>
+                <url>http://nexus.demo.icefery.xyz/repository/nexus-release</url>
+            </repository> 
+        -->
+        <!-- github packages -->
         <repository>
-            <id>maven-custom</id>
-            <url>http://nexus.dev.icefery.xyz/repository/maven-custom/</url>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/icefery/my-app-maven</url>
         </repository>
     </distributionManagement>
 </project>

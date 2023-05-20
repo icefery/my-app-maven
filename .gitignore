@@ -1,6 +1,12 @@
-### IDE
+### idea
 .idea/
 *.iml
 
-### BUILD
+### vscode
+.vscode/
+
+### maven
+.mvn/
+mvnw
+mvnw.cmd
 target/

@@ -1,0 +1,12 @@
+FROM --platform=${TARGETPLATFORM} maven:3-eclipse-temurin-17 AS builder
+ENV WORKDIR=/my-app
+WORKDIR ${WORKDIR}
+COPY . .
+RUN mvn package -Dmaven.test.skip=true
+
+FROM --platform=${TARGETPLATFORM} eclipse-temurin:17 AS runtime
+ENV WORKDIR=/my-app
+WORKDIR ${WORKDIR}
+COPY --from=builder ${WORKDIR}/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
